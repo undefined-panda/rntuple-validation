@@ -14,12 +14,12 @@ LDFLAGS := $(shell $(ROOT_CONFIG) --libs)
 
 .PHONY: all clean
 
-all: libNestedUnorderedMap.so
+all: $(DICT_DIR)libNestedUnorderedMap.so
 
 NestedUnorderedMap.cxx: NestedUnorderedMap.hxx LinkDef.h
 	$(ROOTCLING) -f $@ $^
 
-libNestedUnorderedMap.so: NestedUnorderedMap.cxx
+$(DICT_DIR)libNestedUnorderedMap.so: NestedUnorderedMap.cxx
 	$(CXX) -shared -fPIC -o $@ $^ $(CXXFLAGS) $(LDFLAGS)
 
 clean:
