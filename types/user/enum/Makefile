@@ -14,12 +14,12 @@ LDFLAGS := $(shell $(ROOT_CONFIG) --libs)
 
 .PHONY: all clean
 
-all: libUserEnum.so
+all: $(DICT_DIR)libUserEnum.so
 
 UserEnum.cxx: UserEnum.hxx LinkDef.h
 	$(ROOTCLING) -f $@ $^
 
-libUserEnum.so: UserEnum.cxx
+$(DICT_DIR)libUserEnum.so: UserEnum.cxx
 	$(CXX) -shared -fPIC -o $@ $^ $(CXXFLAGS) $(LDFLAGS)
 
 clean:
