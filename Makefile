@@ -3,13 +3,16 @@ ifeq ($(ROOT_EXE),)
 $(error Could not find root.exe)
 endif
 
+# 1 - folder, 2 - subfolder, 3 - file type
 define move_files
-    mkdir -p $(1)_files && \
-    find . -name "*.$(1)" -not -path "./$(1)_files/*" -exec mv {} "$(1)_files" \;
+    mkdir -p $(1)/$(2) && find . -name "*.$(3)" -not -path "./$(1)/*" -exec mv {} "$(1)/$(2)" \;
 endef
 
-ver :=
-DICT_DIR := $(shell pwd)/dict/$(ver)/
+dv := # dict version
+wv := # write version
+rv := # read version
+DICT_DIR := $(shell pwd)/dict/$(dv)/
+BASE_DIR := $(shell pwd)
 export DICT_DIR
 
 .PHONY: all
@@ -17,12 +20,11 @@ all:
 	$(MAKE) dict
 	$(MAKE) write
 	$(MAKE) read
-	$(MAKE) store
 
 # This assumes there is no whitespace in any of the paths...
 DICT_MAKEFILE_DIR := $(sort $(shell find */ -name Makefile -printf "%h\n"))
 WRITE_C := $(sort $(shell find . -name write.C))
-READ_C := $(sort $(shell find . -name read.C))
+READ_C := $(sort $(shell find . -name read.C)) # get absolute paths of read.C files
 
 .PHONY: dict
 dict:: $(DICT_MAKEFILE_DIR)
@@ -35,14 +37,11 @@ $(DICT_DIR)::
 .PHONY: write
 write:: $(WRITE_C)
 $(WRITE_C)::
-	@LD_LIBRARY_PATH="$${LD_LIBRARY_PATH:+$$LD_LIBRARY_PATH:}$(or $(DICT_DIR),$(shell dirname $@))" $(ROOT_EXE) -q -l $@
+	@LD_LIBRARY_PATH="$${LD_LIBRARY_PATH:+$$LD_LIBRARY_PATH:}$(DICT_DIR)" $(ROOT_EXE) -q -l $@
+	@$(call move_files,write,$(dv),root)
 
 .PHONY: read
 read:: $(READ_C)
 $(READ_C)::
-	@LD_LIBRARY_PATH="$${LD_LIBRARY_PATH:+$$LD_LIBRARY_PATH:}$(or $(DICT_DIR),$(shell dirname $@))" $(ROOT_EXE) -q -l $@
-
-.PHONY: store
-store:
-	@$(call move_files,root)
-	@$(call move_files,json)
+	@cd write/$(wv) && LD_LIBRARY_PATH="$${LD_LIBRARY_PATH:+$$LD_LIBRARY_PATH:}$(DICT_DIR)" $(ROOT_EXE) -q -l $(BASE_DIR)/$@
+	@$(call move_files,read,$(dv)/$(rv),json)
