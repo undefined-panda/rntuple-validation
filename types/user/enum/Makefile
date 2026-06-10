@@ -16,12 +16,11 @@ LDFLAGS := $(shell $(ROOT_CONFIG) --libs)
 
 all: $(DICT_DIR)libUserEnum.so
 
-UserEnum.cxx: UserEnum.hxx LinkDef.h
+$(DICT_DIR)UserEnum.cxx: UserEnum.hxx LinkDef.h
 	$(ROOTCLING) -f $@ $^
 
-$(DICT_DIR)libUserEnum.so: UserEnum.cxx
-	$(CXX) -shared -fPIC -o $@ $^ $(CXXFLAGS) $(LDFLAGS)
-	mv UserEnum_rdict.pcm $(DICT_DIR)
+$(DICT_DIR)libUserEnum.so: $(DICT_DIR)UserEnum.cxx
+	$(CXX) -shared -fPIC -o $@ $^ $(CXXFLAGS) $(LDFLAGS) -I $$(pwd)
 
 clean:
 	$(RM) UserEnum.cxx UserEnum_rdict.pcm libUserEnum.so

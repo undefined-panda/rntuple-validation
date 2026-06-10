@@ -8,7 +8,9 @@ define move_files
     find . -name "*.$(1)" -not -path "./$(1)_files/*" -exec mv {} "$(1)_files" \;
 endef
 
-dict_dir :=
+ver :=
+DICT_DIR := $(shell pwd)/dict/$(ver)/
+export DICT_DIR
 
 .PHONY: all
 all:
@@ -24,25 +26,11 @@ READ_C := $(sort $(shell find . -name read.C))
 
 .PHONY: dict
 dict:: $(DICT_MAKEFILE_DIR)
-
-ifeq ($(dict_dir), )
-DICT_DIR := ""
-export DICT_DIR
-$(warning No directory for dictionaries defined (use 'dict_dir' flag).)
-
-$(DICT_MAKEFILE_DIR)::
-	@$(MAKE) -C $@
-
-else
-DICT_DIR := $(shell pwd)/$(dict_dir)/
-export DICT_DIR
-
 $(DICT_MAKEFILE_DIR):: $(DICT_DIR)
 	@$(MAKE) -C $@
 $(DICT_DIR)::
-	$(shell mkdir -p $@)
+	@mkdir -p $@
 	$(info Storing dictionaries in: '$@')
-endif
 
 .PHONY: write
 write:: $(WRITE_C)

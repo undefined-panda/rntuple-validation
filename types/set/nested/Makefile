@@ -16,12 +16,11 @@ LDFLAGS := $(shell $(ROOT_CONFIG) --libs)
 
 all: $(DICT_DIR)libNestedSet.so
 
-NestedSet.cxx: NestedSet.hxx LinkDef.h
+$(DICT_DIR)NestedSet.cxx: NestedSet.hxx LinkDef.h
 	$(ROOTCLING) -f $@ $^
 
-$(DICT_DIR)libNestedSet.so: NestedSet.cxx
-	$(CXX) -shared -fPIC -o $@ $^ $(CXXFLAGS) $(LDFLAGS)
-	mv NestedSet_rdict.pcm $(DICT_DIR)
+$(DICT_DIR)libNestedSet.so: $(DICT_DIR)NestedSet.cxx
+	$(CXX) -shared -fPIC -o $@ $^ $(CXXFLAGS) $(LDFLAGS) -I $$(pwd)
 
 clean:
 	$(RM) NestedSet.cxx NestedSet_rdict.pcm libNestedSet.so
