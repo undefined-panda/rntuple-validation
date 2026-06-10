@@ -16,12 +16,11 @@ LDFLAGS := $(shell $(ROOT_CONFIG) --libs)
 
 all: $(DICT_DIR)libNestedMap.so
 
-NestedMap.cxx: NestedMap.hxx LinkDef.h
-	$(ROOTCLING) -f $@ $^
+$(DICT_DIR)NestedMap.cxx: NestedMap.hxx LinkDef.h
+	$(ROOTCLING) -f $@ $^ 
 
-$(DICT_DIR)libNestedMap.so: NestedMap.cxx
-	$(CXX) -shared -fPIC -o $@ $^ $(CXXFLAGS) $(LDFLAGS)
-	mv NestedMap_rdict.pcm $(DICT_DIR)
+$(DICT_DIR)libNestedMap.so: $(DICT_DIR)NestedMap.cxx
+	$(CXX) -shared -fPIC -o $@ $^ $(CXXFLAGS) $(LDFLAGS) -I $$(pwd)
 
 clean:
 	$(RM) NestedMap.cxx NestedMap_rdict.pcm libNestedMap.so

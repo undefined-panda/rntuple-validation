@@ -16,12 +16,11 @@ LDFLAGS := $(shell $(ROOT_CONFIG) --libs)
 
 all: $(DICT_DIR)libNestedUnorderedMultiset.so
 
-NestedUnorderedMultiset.cxx: NestedUnorderedMultiset.hxx LinkDef.h
+$(DICT_DIR)NestedUnorderedMultiset.cxx: NestedUnorderedMultiset.hxx LinkDef.h
 	$(ROOTCLING) -f $@ $^
 
-$(DICT_DIR)libNestedUnorderedMultiset.so: NestedUnorderedMultiset.cxx
-	$(CXX) -shared -fPIC -o $@ $^ $(CXXFLAGS) $(LDFLAGS)
-	mv NestedUnorderedMultiset_rdict.pcm $(DICT_DIR)
+$(DICT_DIR)libNestedUnorderedMultiset.so: $(DICT_DIR)NestedUnorderedMultiset.cxx
+	$(CXX) -shared -fPIC -o $@ $^ $(CXXFLAGS) $(LDFLAGS) -I $$(pwd)
 
 clean:
 	$(RM) NestedUnorderedMultiset.cxx NestedUnorderedMultiset_rdict.pcm libNestedUnorderedMultiset.so
