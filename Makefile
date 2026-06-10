@@ -3,13 +3,10 @@ ifeq ($(ROOT_EXE),)
 $(error Could not find root.exe)
 endif
 
-define move_files
-    mkdir -p $(1)_files && \
-    find . -name "*.$(1)" -not -path "./$(1)_files/*" -exec mv {} "$(1)_files" \;
-endef
-
-ver :=
-DICT_DIR := $(shell pwd)/dict/$(ver)/
+DICT_DIR := $(shell pwd)/dict/$(dict_dir)
+WRITE_DIR := $(shell pwd)/write/$(write_dir)
+READ_DIR := $(shell pwd)/read/$(write_dir)/$(read_dir)
+BASE_DIR := $(shell pwd)
 export DICT_DIR
 
 .PHONY: all
@@ -17,7 +14,6 @@ all:
 	$(MAKE) dict
 	$(MAKE) write
 	$(MAKE) read
-	$(MAKE) store
 
 # This assumes there is no whitespace in any of the paths...
 DICT_MAKEFILE_DIR := $(sort $(shell find */ -name Makefile -printf "%h\n"))
@@ -34,15 +30,17 @@ $(DICT_DIR)::
 
 .PHONY: write
 write:: $(WRITE_C)
-$(WRITE_C)::
-	@LD_LIBRARY_PATH="$${LD_LIBRARY_PATH:+$$LD_LIBRARY_PATH:}$(or $(DICT_DIR),$(shell dirname $@))" $(ROOT_EXE) -q -l $@
+$(WRITE_C):: $(WRITE_DIR)
+	@LD_LIBRARY_PATH="$${LD_LIBRARY_PATH:+$$LD_LIBRARY_PATH:}$(DICT_DIR)" $(ROOT_EXE) -q -l '$@("$(WRITE_DIR)/$(subst /,.,$(shell dirname $@)).root")'
+$(WRITE_DIR)::
+	@mkdir -p $@
+	$(info Storing root files in: '$@')
 
 .PHONY: read
 read:: $(READ_C)
-$(READ_C)::
-	@LD_LIBRARY_PATH="$${LD_LIBRARY_PATH:+$$LD_LIBRARY_PATH:}$(or $(DICT_DIR),$(shell dirname $@))" $(ROOT_EXE) -q -l $@
-
-.PHONY: store
-store:
-	@$(call move_files,root)
-	@$(call move_files,json)
+$(READ_C):: $(READ_DIR)
+	@LD_LIBRARY_PATH="$${LD_LIBRARY_PATH:+$$LD_LIBRARY_PATH:}$(DICT_DIR)" $(ROOT_EXE) -q -l \
+	'$@("$(WRITE_DIR)/$(subst /,.,$(shell dirname $@)).root", "$(READ_DIR)/$(subst /,.,$(shell dirname $@)).json")'
+$(READ_DIR)::
+	@mkdir -p $@
+	$(info Storing root files in: '$@')

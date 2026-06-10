@@ -14,13 +14,13 @@ LDFLAGS := $(shell $(ROOT_CONFIG) --libs)
 
 .PHONY: all clean
 
-all: $(DICT_DIR)libNestedUnorderedMultiset.so
+all: $(DICT_DIR)/libNestedUnorderedMultiset.so
 
-$(DICT_DIR)NestedUnorderedMultiset.cxx: NestedUnorderedMultiset.hxx LinkDef.h
+$(DICT_DIR)/NestedUnorderedMultiset.cxx: NestedUnorderedMultiset.hxx LinkDef.h
 	$(ROOTCLING) -f $@ $^
 
-$(DICT_DIR)libNestedUnorderedMultiset.so: $(DICT_DIR)NestedUnorderedMultiset.cxx
-	$(CXX) -shared -fPIC -o $@ $^ $(CXXFLAGS) $(LDFLAGS) -I $$(pwd)
+$(DICT_DIR)/libNestedUnorderedMultiset.so: $(DICT_DIR)/NestedUnorderedMultiset.cxx
+	$(CXX) -shared -fPIC -o $@ $^ $(CXXFLAGS) $(LDFLAGS) -I .
 
 clean:
 	$(RM) NestedUnorderedMultiset.cxx NestedUnorderedMultiset_rdict.pcm libNestedUnorderedMultiset.so
