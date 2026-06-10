@@ -21,6 +21,7 @@ UserClass.cxx: UserClass.hxx LinkDef.h
 
 $(DICT_DIR)libUserClass.so: UserClass.cxx
 	$(CXX) -shared -fPIC -o $@ $^ $(CXXFLAGS) $(LDFLAGS)
+	mv UserClass_rdict.pcm $(DICT_DIR)
 
 clean:
 	$(RM) UserClass.cxx UserClass_rdict.pcm libUserClass.so

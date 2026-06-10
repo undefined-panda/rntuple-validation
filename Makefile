@@ -5,7 +5,7 @@ endif
 
 define move_files
     mkdir -p $(1)_files && \
-    find . -name "*.$(1)" -exec mv {} "$(1)_files" \;
+    find . -name "*.$(1)" -not -path "./$(1)_files/*" -exec mv {} "$(1)_files" \;
 endef
 
 dict_dir :=
@@ -47,12 +47,12 @@ endif
 .PHONY: write
 write:: $(WRITE_C)
 $(WRITE_C)::
-	@LD_LIBRARY_PATH="$${LD_LIBRARY_PATH:+$$LD_LIBRARY_PATH:}$(shell dirname $@)" $(ROOT_EXE) -q -l $@
+	@LD_LIBRARY_PATH="$${LD_LIBRARY_PATH:+$$LD_LIBRARY_PATH:}$(or $(DICT_DIR),$(shell dirname $@))" $(ROOT_EXE) -q -l $@
 
 .PHONY: read
 read:: $(READ_C)
 $(READ_C)::
-	@LD_LIBRARY_PATH="$${LD_LIBRARY_PATH:+$$LD_LIBRARY_PATH:}$(shell dirname $@)" $(ROOT_EXE) -q -l $@
+	@LD_LIBRARY_PATH="$${LD_LIBRARY_PATH:+$$LD_LIBRARY_PATH:}$(or $(DICT_DIR),$(shell dirname $@))" $(ROOT_EXE) -q -l $@
 
 .PHONY: store
 store:

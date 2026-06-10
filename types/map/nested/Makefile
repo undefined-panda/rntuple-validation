@@ -21,6 +21,7 @@ NestedMap.cxx: NestedMap.hxx LinkDef.h
 
 $(DICT_DIR)libNestedMap.so: NestedMap.cxx
 	$(CXX) -shared -fPIC -o $@ $^ $(CXXFLAGS) $(LDFLAGS)
+	mv NestedMap_rdict.pcm $(DICT_DIR)
 
 clean:
 	$(RM) NestedMap.cxx NestedMap_rdict.pcm libNestedMap.so

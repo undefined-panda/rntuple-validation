@@ -21,6 +21,7 @@ NestedMultimap.cxx: NestedMultimap.hxx LinkDef.h
 
 $(DICT_DIR)libNestedMultimap.so: NestedMultimap.cxx
 	$(CXX) -shared -fPIC -o $@ $^ $(CXXFLAGS) $(LDFLAGS)
+	mv NestedMultimap_rdict.pcm $(DICT_DIR)
 
 clean:
 	$(RM) NestedMultimap.cxx NestedMultimap_rdict.pcm libNestedMultimap.so

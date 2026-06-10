@@ -21,6 +21,7 @@ NestedMultiset.cxx: NestedMultiset.hxx LinkDef.h
 
 $(DICT_DIR)libNestedMultiset.so: NestedMultiset.cxx
 	$(CXX) -shared -fPIC -o $@ $^ $(CXXFLAGS) $(LDFLAGS)
+	mv NestedMultiset_rdict.pcm $(DICT_DIR)
 
 clean:
 	$(RM) NestedMultiset.cxx NestedMultiset_rdict.pcm libNestedMultiset.so
