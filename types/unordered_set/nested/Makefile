@@ -21,6 +21,7 @@ NestedUnorderedSet.cxx: NestedUnorderedSet.hxx LinkDef.h
 
 $(DICT_DIR)libNestedUnorderedSet.so: NestedUnorderedSet.cxx
 	$(CXX) -shared -fPIC -o $@ $^ $(CXXFLAGS) $(LDFLAGS)
+	mv NestedUnorderedSet_rdict.pcm $(DICT_DIR)
 
 clean:
 	$(RM) NestedUnorderedSet.cxx NestedUnorderedSet_rdict.pcm libNestedUnorderedSet.so

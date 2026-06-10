@@ -21,6 +21,7 @@ NestedSet.cxx: NestedSet.hxx LinkDef.h
 
 $(DICT_DIR)libNestedSet.so: NestedSet.cxx
 	$(CXX) -shared -fPIC -o $@ $^ $(CXXFLAGS) $(LDFLAGS)
+	mv NestedSet_rdict.pcm $(DICT_DIR)
 
 clean:
 	$(RM) NestedSet.cxx NestedSet_rdict.pcm libNestedSet.so

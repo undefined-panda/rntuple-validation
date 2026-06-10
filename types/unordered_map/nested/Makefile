@@ -21,6 +21,7 @@ NestedUnorderedMap.cxx: NestedUnorderedMap.hxx LinkDef.h
 
 $(DICT_DIR)libNestedUnorderedMap.so: NestedUnorderedMap.cxx
 	$(CXX) -shared -fPIC -o $@ $^ $(CXXFLAGS) $(LDFLAGS)
+	mv NestedUnorderedMap_rdict.pcm $(DICT_DIR)
 
 clean:
 	$(RM) NestedUnorderedMap.cxx NestedUnorderedMap_rdict.pcm libNestedUnorderedMap.so

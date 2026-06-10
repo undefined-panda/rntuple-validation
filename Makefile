@@ -5,7 +5,7 @@ endif
 
 define move_files
     mkdir -p $(1)_files && \
-    find . -name "*.$(1)" -exec mv {} "$(1)_files" \;
+    find . -name "*.$(1)" -not -path "./$(1)_files/*" -exec mv {} "$(1)_files" \;
 endef
 
 dict_dir :=

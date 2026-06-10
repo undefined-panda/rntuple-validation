@@ -21,6 +21,7 @@ UserEnum.cxx: UserEnum.hxx LinkDef.h
 
 $(DICT_DIR)libUserEnum.so: UserEnum.cxx
 	$(CXX) -shared -fPIC -o $@ $^ $(CXXFLAGS) $(LDFLAGS)
+	mv UserEnum_rdict.pcm $(DICT_DIR)
 
 clean:
 	$(RM) UserEnum.cxx UserEnum_rdict.pcm libUserEnum.so
