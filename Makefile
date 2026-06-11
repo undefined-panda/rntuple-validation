@@ -32,7 +32,7 @@ $(DICT_DIR)::
 .PHONY: write
 write:: $(WRITE_C)
 $(WRITE_C):: $(WRITE_DIR)
-	@LD_LIBRARY_PATH="$${LD_LIBRARY_PATH:+$$LD_LIBRARY_PATH:}$(DICT_DIR)" $(ROOT_EXE) -q -l '$@("$(WRITE_DIR)/$(subst /,.,$(subst write.C,root,$@))")'
+	@LD_LIBRARY_PATH="$${LD_LIBRARY_PATH:+$$LD_LIBRARY_PATH:}$(DICT_DIR)" $(ROOT_EXE) -q -l '$@("$(WRITE_DIR)/$(subst /,.,$(shell dirname $@)).root")'
 $(WRITE_DIR)::
 	@if [ -z "$(write_dir)" ]; then echo "ERROR: write_dir is not set"; exit 1; fi
 	@if [ -z "$(dict_dir)" ]; then echo "ERROR: dict_dir is not set"; exit 1; fi
@@ -43,7 +43,7 @@ $(WRITE_DIR)::
 read:: $(READ_C)
 $(READ_C):: $(READ_DIR)
 	@LD_LIBRARY_PATH="$${LD_LIBRARY_PATH:+$$LD_LIBRARY_PATH:}$(DICT_DIR)" $(ROOT_EXE) -q -l \
-	'$@("$(WRITE_DIR)/$(subst /,.,$(subst read.C,root,$@))", "$(READ_DIR)/$(subst /,.,$(subst read.C,json,$@))")'
+	'$@("$(WRITE_DIR)/$(subst /,.,$(shell dirname $@)).root", "$(READ_DIR)/$(subst /,.,$(shell dirname $@)).json")'
 $(READ_DIR)::
 	@if [ -z "$(read_dir)" ]; then echo "ERROR: read_dir is not set"; exit 1; fi
 	@if [ -z "$(write_dir)" ]; then echo "ERROR: write_dir is not set"; exit 1; fi
