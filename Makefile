@@ -25,7 +25,6 @@ dict:: $(DICT_MAKEFILE_DIR)
 $(DICT_MAKEFILE_DIR):: $(DICT_DIR)
 	@$(MAKE) -C $@
 $(DICT_DIR)::
-	@if [ -z "$(dict_dir)" ]; then echo "ERROR: dict_dir is not set"; exit 1; fi
 	@mkdir -p $@
 	$(info Storing dictionaries in: '$@')
 
@@ -34,8 +33,6 @@ write:: $(WRITE_C)
 $(WRITE_C):: $(WRITE_DIR)
 	@LD_LIBRARY_PATH="$${LD_LIBRARY_PATH:+$$LD_LIBRARY_PATH:}$(DICT_DIR)" $(ROOT_EXE) -q -l '$@("$(WRITE_DIR)/$(subst /,.,$(shell dirname $@)).root")'
 $(WRITE_DIR)::
-	@if [ -z "$(write_dir)" ]; then echo "ERROR: write_dir is not set"; exit 1; fi
-	@if [ -z "$(dict_dir)" ]; then echo "ERROR: dict_dir is not set"; exit 1; fi
 	@mkdir -p $@
 	$(info Storing root files in: '$@')
 
@@ -45,8 +42,5 @@ $(READ_C):: $(READ_DIR)
 	@LD_LIBRARY_PATH="$${LD_LIBRARY_PATH:+$$LD_LIBRARY_PATH:}$(DICT_DIR)" $(ROOT_EXE) -q -l \
 	'$@("$(WRITE_DIR)/$(subst /,.,$(shell dirname $@)).root", "$(READ_DIR)/$(subst /,.,$(shell dirname $@)).json")'
 $(READ_DIR)::
-	@if [ -z "$(read_dir)" ]; then echo "ERROR: read_dir is not set"; exit 1; fi
-	@if [ -z "$(write_dir)" ]; then echo "ERROR: write_dir is not set"; exit 1; fi
-	@if [ -z "$(dict_dir)" ]; then echo "ERROR: dict_dir is not set"; exit 1; fi
 	@mkdir -p $@
 	$(info Storing root files in: '$@')
