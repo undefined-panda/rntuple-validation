@@ -3,6 +3,7 @@ ifeq ($(ROOT_EXE),)
 $(error Could not find root.exe)
 endif
 
+# directory arguments can be empty -> no sudirectories will be created, everything will be stored directly in those folders
 DICT_DIR := $(shell pwd)/dict/$(dict_dir)
 WRITE_DIR := $(shell pwd)/write/$(write_dir)
 READ_DIR := $(shell pwd)/read/$(write_dir)/$(read_dir)
