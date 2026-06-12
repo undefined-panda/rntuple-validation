@@ -1,14 +1,23 @@
-ROOT_EXE ?= $(shell which root.exe)
-ifeq ($(ROOT_EXE),)
-$(error Could not find root.exe)
-endif
+SHELL := /bin/bash # to use 'source' command 
 
-# directory arguments can be empty -> no sudirectories will be created, everything will be stored directly in those folders
-DICT_DIR := $(shell pwd)/dict/$(dict_dir)
-WRITE_DIR := $(shell pwd)/write/$(write_dir)
-READ_DIR := $(shell pwd)/read/$(write_dir)/$(read_dir)
-BASE_DIR := $(shell pwd)
-export DICT_DIR
+#ROOT_EXE ?= $(shell which root.exe)
+#ifeq ($(ROOT_EXE),)
+#$(error Could not find root.exe)
+#ndif
+
+ROOT_VERSION := $(shell root-config --version)
+ROOT_EXE = $(shell which root.exe)
+
+# if directory arguments (dict_dir, write_dir, read_dir) are empty, current ROOT version will be used as folder name
+DICT_DIR := $(shell pwd)/dict/$(or $(dict_dir),$(ROOT_VERSION))
+WRITE_DIR := $(shell pwd)/write/$(or $(write_dir),$(ROOT_VERSION))
+READ_DIR := $(shell pwd)/read/$(or $(read_dir),$(ROOT_VERSION))
+export DICT_DIR # export to make it available for deeper Makefiles
+
+# This assumes there is no whitespace in any of the paths...
+DICT_MAKEFILE_DIR := $(sort $(shell find */ -name Makefile -printf "%h\n"))
+WRITE_C := $(sort $(shell find . -name write.C))
+READ_C := $(sort $(shell find . -name read.C))
 
 .PHONY: all
 all:
@@ -16,26 +25,26 @@ all:
 	$(MAKE) write
 	$(MAKE) read
 
-# This assumes there is no whitespace in any of the paths...
-DICT_MAKEFILE_DIR := $(sort $(shell find */ -name Makefile -printf "%h\n"))
-WRITE_C := $(sort $(shell find . -name write.C))
-READ_C := $(sort $(shell find . -name read.C))
+# run this target for each given ROOT version
+.PHONY: validate
+validate:: $(source_dir)
+$(source_dir)::
+	@source $@ && echo -e "\nSourcing '$@' with ROOT version: $(ROOT_VERSION)" && $(MAKE) dict && $(MAKE) write
 
 .PHONY: dict
 dict:: $(DICT_MAKEFILE_DIR)
 $(DICT_MAKEFILE_DIR):: $(DICT_DIR)
 	@$(MAKE) -C $@
 $(DICT_DIR)::
-	@mkdir -p $@
-	$(info Storing dictionaries in: '$@')
+	@echo -e "\nStoring dictionaries in: '$@'" && mkdir -p $@
 
 .PHONY: write
 write:: $(WRITE_C)
 $(WRITE_C):: $(WRITE_DIR)
-	@LD_LIBRARY_PATH="$${LD_LIBRARY_PATH:+$$LD_LIBRARY_PATH:}$(DICT_DIR)" $(ROOT_EXE) -q -l '$@("$(WRITE_DIR)/$(subst /,.,$(shell dirname $@)).root")'
+	@LD_LIBRARY_PATH="$${LD_LIBRARY_PATH:+$$LD_LIBRARY_PATH:}$(DICT_DIR)" $(ROOT_EXE) -q -l \
+	'$@("$(WRITE_DIR)/$(subst /,.,$(shell dirname $@)).root")'
 $(WRITE_DIR)::
-	@mkdir -p $@
-	$(info Storing root files in: '$@')
+	@echo -e "\nStoring root files in: '$@'" && mkdir -p $@
 
 .PHONY: read
 read:: $(READ_C)
@@ -43,5 +52,4 @@ $(READ_C):: $(READ_DIR)
 	@LD_LIBRARY_PATH="$${LD_LIBRARY_PATH:+$$LD_LIBRARY_PATH:}$(DICT_DIR)" $(ROOT_EXE) -q -l \
 	'$@("$(WRITE_DIR)/$(subst /,.,$(shell dirname $@)).root", "$(READ_DIR)/$(subst /,.,$(shell dirname $@)).json")'
 $(READ_DIR)::
-	@mkdir -p $@
-	$(info Storing root files in: '$@')
+	@echo -e "\nStoring json files in: '$@'" && mkdir -p $@
