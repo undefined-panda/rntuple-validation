@@ -71,18 +71,19 @@ validate:
 	
 #	run make read to do cross-validation
 	@for s_path in $(source_scripts); do \
-		for w_dir in write/*; do \
-			(bash -c "source $$s_path && ROOT_VERSION=\$$(root-config --version) && $(MAKE) read dict_dir=\$$ROOT_VERSION write_dir=$$(basename $$w_dir) read_dir=\$$ROOT_VERSION") || exit $$?; \
-		done; \
+		bash -c "source $$s_path && ROOT_VERSION=\$$(root-config --version) && \
+			for w_dir in write/*; do \
+				$(MAKE) read dict_dir=\$$ROOT_VERSION write_dir=\$$(basename \$$w_dir) read_dir=\$$ROOT_VERSION || exit \$$?; \
+			done" || exit $$?; \
 	done
 
 .PHONY: download
 download: 
 	$(info Downloading and unpacking assets from GitHub..)
-	@wget -q -N -P ./assets https://github.com/root-project/rntuple-validation/releases/download/v$(ASSET_VERSION)/$(ROOT_ASSET)
-	@mkdir -p write && unzip -n -q -d write/$(basename $(ROOT_ASSET)) assets/$(ROOT_ASSET)
-	@wget -q -N -P ./assets https://github.com/root-project/rntuple-validation/releases/download/v$(ASSET_VERSION)/$(JSON_ASSET)
-	@mkdir -p read/$(basename $(ROOT_ASSET)) && unzip -n -q -d read/$(basename $(ROOT_ASSET))/$(basename $(JSON_ASSET)) assets/$(JSON_ASSET)
+	@curl -sSL --create-dirs -o ./assets/$(ROOT_ASSET) -z ./assets/$(ROOT_ASSET) https://github.com/root-project/rntuple-validation/releases/download/v$(ASSET_VERSION)/$(ROOT_ASSET)
+	@mkdir -p write && unzip -n -q -d write/$(basename $(ROOT_ASSET)) assets/$(basename $(ROOT_ASSET))
+	@curl -sSL --create-dirs -o ./assets/$(JSON_ASSET) -z ./assets/$(JSON_ASSET) https://github.com/root-project/rntuple-validation/releases/download/v$(ASSET_VERSION)/$(JSON_ASSET)
+	@mkdir -p read/$(basename $(ROOT_ASSET)) && unzip -n -q -d read/$(basename $(ROOT_ASSET))/$(basename $(JSON_ASSET)) assets/$(basename $(JSON_ASSET))
 
 .PHONY: export_html
 export_html:

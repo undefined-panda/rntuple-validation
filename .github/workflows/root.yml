@@ -1,28 +1,57 @@
 name: Execute ROOT macros
 on:
   push:
-    branches: 'main'
+    branches:
+      - 'main'
+      - 'self-hosted-ci'
   pull_request:
+  workflow_dispatch:
+  # schedule:
+  #   - cron: '0 2 * * *' # daily at 2am
+  #     timezone: 'Europe/Berlin'
 
 jobs:
   root-v636:
     name: ROOT 6.36
-    runs-on: ubuntu-latest
-    container: rootproject/root:6.36.00-ubuntu25.04
+    runs-on:
+      labels: [self-hosted]
+
+    container:
+      image: gitlab-registry.cern.ch/sft/docker/alma9-core:latest
+      options: --security-opt label=disable --rm
+      volumes:
+        - /cvmfs/sft.cern.ch:/cvmfs/sft.cern.ch:ro
+
     steps:
       - name: Check out repository
         uses: actions/checkout@v5
-      - name: Execute ROOT macros
-        run: make
+
+      - name: Download assets
+        run: make download
+      
+      - name: Run Validation Suite
+        run: make -j4 validate source_scripts="/cvmfs/sft.cern.ch/lcg/views/LCG_110/x86_64-el9-gcc13-opt/setup.sh"
+
+      - name: Export HTML
+        run: make export_html
+
       - name: Upload produced RNTuple ROOT files
         uses: actions/upload-artifact@v7
         with:
           name: RNTuple-ROOT
-          path: "write/*.root"
+          path: "write/**/*.root"
           if-no-files-found: error
       - name: Upload produced validation JSON files
         uses: actions/upload-artifact@v7
         with:
           name: Validation-JSON
-          path: "read/*.json"
+          path: "read/**/*.json"
           if-no-files-found: error
+
+      - name: Upload validation report
+        uses: actions/upload-artifact@v7
+        with:
+          name: validation-report
+          path: ${{ github.workspace }}/web/html/cross_validation_results.html
+          archive: false
+          retention-days: 30
