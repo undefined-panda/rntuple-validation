@@ -71,9 +71,10 @@ validate:
 	
 #	run make read to do cross-validation
 	@for s_path in $(source_scripts); do \
-		for w_dir in write/*; do \
-			(bash -c "source $$s_path && ROOT_VERSION=\$$(root-config --version) && $(MAKE) read dict_dir=\$$ROOT_VERSION write_dir=$$(basename $$w_dir) read_dir=\$$ROOT_VERSION") || exit $$?; \
-		done; \
+		bash -c "source $$s_path && ROOT_VERSION=\$$(root-config --version) && \
+			for w_dir in write/*; do \
+				$(MAKE) read dict_dir=\$$ROOT_VERSION write_dir=\$$(basename \$$w_dir) read_dir=\$$ROOT_VERSION || exit \$$?; \
+			done" || exit $$?; \
 	done
 
 .PHONY: download
