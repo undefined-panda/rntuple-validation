@@ -1,4 +1,6 @@
 *.json
+!package.json
+!package-lock.json
 *.root
 
 # Ignore files related to dictionary generation
@@ -9,3 +11,4 @@ User*.cxx
 *.zip
 *.html
 !template.html
+node_modules/

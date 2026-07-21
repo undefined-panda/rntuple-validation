@@ -1,0 +1,58 @@
+import { version, openFile, TSelector } from 'jsroot';
+import { readHeaderFooter, rntupleProcess } from 'jsroot/rntuple';
+import { writeFileSync, mkdirSync, existsSync } from 'fs';
+import { writeJson } from '#jsroot_reader';
+import { fileURLToPath } from 'node:url';
+import { relative } from 'node:path';
+
+/*
+The following change in rntuple.mjs was necessary to make this test run:
+1. line 910 & 919: remove Number() to avoid rouding of BigInt values
+*/
+
+const __filename = fileURLToPath(import.meta.url);
+const relativePath = relative(process.cwd(), __filename);
+
+async function read(input="types.fundamental.integer.root", output="types.fundamental.integer.json") {
+   const file = await openFile(input),
+         rntuple = await file.readObject('ntpl'),
+         marker = '__BIGINT__'; // used to write BigInts as string in JSON and then convert to number to avoid precision loss
+      
+   let dict = [], entry;
+      
+   // define fields that exist in .root file
+   const selector = new TSelector(),
+         fields = ["Int8", "UInt8", "Int16", 
+                   "UInt16", "Int32", "UInt32", 
+                   "Int64", "UInt64", "SplitInt16", 
+                   "SplitUInt16", "SplitInt32", "SplitUInt32",
+                   "SplitInt64", "SplitUInt64"];
+   
+   for (const f of fields) {
+      selector.addBranch(f);
+   }
+   
+   selector.Begin = () => {
+      console.log('Processing [JSROOT]', relativePath+'("'+input+'"', '"'+output+'")'); // create same output as for read.C macros
+   };
+
+   selector.Process = function(entryIndex) {
+      const subdict = {};      
+      for (const field of fields) {
+         try {
+            const value = this.tgtobj[field];
+            const res = typeof value === 'bigint' ? `${marker}${value}${marker}` : value;
+            subdict[field] = res;
+         } catch (err) {
+            console.error(`ERROR: Failed to read ${field} at entry ${entryIndex}: ${err.message}`);
+         }
+      }
+      dict.push(subdict)
+   };
+
+   await rntupleProcess(rntuple, selector);
+   writeJson(dict, output, marker);
+}
+
+const [input, output] = process.argv.slice(2);
+read(input, output);

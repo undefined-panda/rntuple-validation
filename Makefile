@@ -18,7 +18,7 @@ all: check
 	$(MAKE) read
 
 # This assumes there is no whitespace in any of the paths...
-DICT_MAKEFILE_DIR := $(sort $(shell find */ -name Makefile -printf "%h\n"))
+DICT_MAKEFILE_DIR := $(sort $(shell find */ -name Makefile -not -path "node_modules/*" -printf "%h\n"))
 WRITE_C := $(sort $(shell find . -name write.C))
 READ_C := $(sort $(shell find . -name read.C))
 READ_JSROOT := $(sort $(shell find . -name read.mjs))
