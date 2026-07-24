@@ -14,6 +14,7 @@ jobs:
   root-v636:
     name: ROOT 6.36
     runs-on:
+      group: CPU
       labels: [self-hosted]
 
     container:
