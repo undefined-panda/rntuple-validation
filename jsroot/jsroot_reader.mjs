@@ -1,5 +1,5 @@
 import { writeFileSync, mkdirSync, existsSync } from "fs";
-import { openFile, TSelector } from "jsroot";
+import { openFile, TSelector, version } from "jsroot";
 import { rntupleProcess } from "jsroot/rntuple";
 
 /**
@@ -131,5 +131,16 @@ export function pairArrayToMap(arr) {
       p.first,
       Array.isArray(p.second) ? pairArrayToMap(p.second) : p.second,
     ]),
+  );
+}
+
+// check if current version is newer than target
+export function isNewer(target) {
+  const [major, minor, patch] = version.split(" ")[0].split(".").map(Number);
+  const [tMajor, tMinor, tPatch] = target.split(".").map(Number);
+  return (
+    major > tMajor ||
+    (major === tMajor && minor > tMinor) ||
+    (major === tMajor && minor === tMinor && patch > tPatch)
   );
 }

@@ -1,4 +1,9 @@
-import { read } from "../../jsroot_reader.mjs";
+import { read, isNewer } from "../../jsroot_reader.mjs";
+
+if (!isNewer("7.11.1")) {
+  console.log(" -> Skipped structure/empty: version too low")
+  process.exit();
+}
 
 const fields = ["Int32"];
 

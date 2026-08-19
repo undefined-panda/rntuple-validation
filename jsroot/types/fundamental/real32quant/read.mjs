@@ -1,4 +1,9 @@
-import { read, floatToHex } from "../../../jsroot_reader.mjs";
+import { read, floatToHex, isNewer } from "../../../jsroot_reader.mjs";
+
+if (!isNewer("7.11.1")) {
+  console.log(" -> Skipped types/fundamental/real32quant: version too low")
+  process.exit();
+}
 
 function formatFloat(num, { field }) {
   // round num to single-precision float to match the required field precision
