@@ -1,9 +1,9 @@
-import { read } from "../../../jsroot_reader.mjs";
+import { read, isNewer } from "../../../jsroot_reader.mjs";
 
-/*
-The following change in rntuple.mjs was necessary to make this test run:
-1. line 910 & 919: remove Number() to avoid rounding of BigInt values
-*/
+if (!isNewer("7.11.1")) {
+  console.log(" -> Skipped types/fundamental/integer: version too low")
+  process.exit();
+}
 
 function checkBigInt(value, { marker }) {
   const res = typeof value === "bigint" ? `${marker}${value}${marker}` : value;
