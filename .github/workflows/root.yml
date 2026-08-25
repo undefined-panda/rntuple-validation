@@ -25,6 +25,7 @@ on:
 
 jobs:
   cross-validation:
+    if: github.repository_owner == 'root-project' || github.event_name == 'pull_request'
     name: Cross Validation
     runs-on:
       labels: [self-hosted]
